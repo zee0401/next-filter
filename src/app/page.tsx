@@ -4,7 +4,11 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Product } from "@/db";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { QueryResult } from "@upstash/vector";
+import axios from "axios";
 import { ChevronDown, Filter } from "lucide-react";
 import { useState } from "react";
 
@@ -32,6 +36,21 @@ export default function Home() {
       sort: value,
     }));
   };
+
+  const {} = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data } = await axios.post<QueryResult<Product>[]>(
+        "http://localhost:3000/api/products",
+        {
+          filter: {
+            sort: filter.sort,
+          },
+        }
+      );
+      return data;
+    },
+  });
 
   return (
     <main className="mx-auto max-w7xl px-4 sm:px-8">
