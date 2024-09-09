@@ -26,8 +26,6 @@ export default function Home() {
     sort: "none",
   });
 
-  console.log(filter);
-
   const handleClick = (value: string) => {
     setFilter((prev) => ({
       ...prev,
