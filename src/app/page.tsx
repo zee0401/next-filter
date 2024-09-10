@@ -1,10 +1,10 @@
 "use client";
+import Product from "@/components/Products/Product";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Product } from "@/db";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { QueryResult } from "@upstash/vector";
@@ -12,20 +12,30 @@ import axios from "axios";
 import { ChevronDown, Filter } from "lucide-react";
 import { useState } from "react";
 
+import type { Product as TProduct } from "@/db";
+import ProductSkeleton from "@/components/Products/ProductSkeletin";
+
+const SORT_OPTIONS = [
+  { name: "None", value: "none" },
+
+  {
+    name: "price low to high",
+    value: "price-asc",
+  },
+  {
+    name: "price high to low",
+    value: "price-desc",
+  },
+] as const;
+
+const SUBCATEGORIES = [
+  { name: "T-shirts", selected: true, href: "#" },
+  { name: "Hoodies", selected: false, href: "#" },
+  { name: "Sweaters", selected: false, href: "#" },
+  { name: "Accessories", selected: false, href: "#" },
+] as const;
+
 export default function Home() {
-  const SORT_OPTIONS = [
-    { name: "None", value: "none" },
-
-    {
-      name: "price low to high",
-      value: "price-asc",
-    },
-    {
-      name: "price high to low",
-      value: "price-desc",
-    },
-  ] as const;
-
   const [filter, setFilter] = useState({
     sort: "none",
   });
@@ -37,10 +47,10 @@ export default function Home() {
     }));
   };
 
-  const {} = useQuery({
+  const { data: products } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const { data } = await axios.post<QueryResult<Product>[]>(
+      const { data } = await axios.post<QueryResult<TProduct>[]>(
         "http://localhost:3000/api/products",
         {
           filter: {
@@ -48,10 +58,12 @@ export default function Home() {
           },
         }
       );
+
       return data;
     },
   });
 
+  console.log("products ui", products);
   return (
     <main className="mx-auto max-w7xl px-4 sm:px-8">
       <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
@@ -89,7 +101,32 @@ export default function Home() {
         </div>
       </div>
       <section className="pb-24 pt-6">
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4"></div>
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+          <div className="hidden lg:block">
+            <ul className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
+              {SUBCATEGORIES.map((category) => (
+                <li key={category.name}>
+                  <button
+                    disabled={!category.selected}
+                    className="disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {category.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <ul className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {products
+              ? products?.map((product) => (
+                  <Product product={product?.metadata!} />
+                ))
+              : new Array(12)
+                  .fill(null)
+                  .map((_, i) => <ProductSkeleton key={i} />)}
+          </ul>
+        </div>
       </section>
     </main>
   );

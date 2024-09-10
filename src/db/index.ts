@@ -13,4 +13,7 @@ export type Product = {
   color: "white" | "beige" | "blue" | "green" | "purple";
 };
 
-export const db = new Index<Product>();
+export const db = new Index<Product>({
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  url: process.env.UPSTASH_REDIS_REST_URL,
+});
