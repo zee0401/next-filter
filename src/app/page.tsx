@@ -14,6 +14,11 @@ import { useState } from "react";
 
 import type { Product as TProduct } from "@/db";
 import ProductSkeleton from "@/components/Products/ProductSkeletin";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -33,7 +38,48 @@ const SUBCATEGORIES = [
   { name: "Hoodies", selected: false, href: "#" },
   { name: "Sweaters", selected: false, href: "#" },
   { name: "Accessories", selected: false, href: "#" },
-] as const;
+];
+
+const COLOR_FILTERS = {
+  id: "color",
+  name: "Color",
+  options: [
+    { value: "white", label: "White" },
+    { value: "beige", label: "Beige" },
+    { value: "blue", label: "Blue" },
+    { value: "green", label: "Green" },
+    { value: "purple", label: "Purple" },
+  ] as const,
+};
+
+const SIZE_FILTERS = {
+  id: "size",
+  name: "Size",
+  options: [
+    { value: "S", label: "S" },
+    { value: "M", label: "M" },
+    { value: "L", label: "L" },
+  ],
+} as const;
+
+const DEFAULT_CUSTOM_PRICE = [0, 100] as [number, number];
+
+const PRICE_FILTERS = {
+  id: "price",
+  name: "Price",
+  options: [
+    { value: [0, 100], label: "Any price" },
+    {
+      value: [0, 20],
+      label: "Under 20€",
+    },
+    {
+      value: [0, 40],
+      label: "Under 40€",
+    },
+    // custom option defined in JSX
+  ],
+} as const;
 
 export default function Home() {
   const [filter, setFilter] = useState({
@@ -115,6 +161,13 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+            <Accordion type="multile" className="animate-none">
+              <AccordionItem value="color">
+                <AccordionTrigger className="py-3 text-sm text-gray-400 hover:text-gray-500">
+                  <span className="font-medium text-gray-900">Color</span>
+                </AccordionTrigger>
+              </AccordionItem>
+            </Accordion>
           </div>
 
           <ul className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
